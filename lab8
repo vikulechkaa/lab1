@@ -1,0 +1,106 @@
+#include <iostream>
+#include <Windows.h>
+class Pair 
+{
+public:
+    int first;
+    int second;
+
+    Pair(int a, int b) : first(a), second(b) {}
+
+    // Метод множення на число
+    Pair multiply(int multiplier) const
+    {
+        return Pair(first * multiplier, second * multiplier);
+    }
+
+    // Операція додавання пар
+    Pair operator+(const Pair& other) const
+    {
+        return Pair(first + other.first, second + other.second);
+    }
+};
+
+class Money : public Pair 
+{
+public:
+    Money(int hryvnia, int kopecks) : Pair(hryvnia, kopecks) {}
+
+    // Перевизначення операції додавання для грошових сум
+    Money operator+(const Money& other) const
+    {
+        int totalHryvnia = first + other.first;
+        int totalKopecks = second + other.second;
+
+        // Перевірка переповнення копійок (100 копійок = 1 гривня)
+        if (totalKopecks >= 100) 
+        {
+            totalHryvnia += totalKopecks / 100;
+            totalKopecks %= 100;
+        }
+
+        return Money(totalHryvnia, totalKopecks);
+    }
+
+    // Метод віднімання грошових сум
+    Money subtract(const Money& other) const 
+    {
+        int remainingHryvnia = first - other.first;
+        int remainingKopecks = second - other.second;
+
+        // Перевірка випадку, коли копійок від'ємно
+        if (remainingKopecks < 0)
+        {
+            remainingHryvnia -= 1;
+            remainingKopecks += 100;
+        }
+
+        return Money(remainingHryvnia, remainingKopecks);
+    }
+
+    // Метод ділення грошових сум
+    Money divide(int divisor) const {
+        return Money(first / divisor, second / divisor);
+    }
+};
+
+int main() 
+{
+    SetConsoleCP(1251);
+    SetConsoleOutputCP(1251);
+    // Приклад використання класів
+
+    // Створення пар цілих чисел
+    Pair pair1(2, 3);
+    Pair pair2(1, 4);
+
+    // Використання методу множення
+    Pair multipliedPair = pair1.multiply(2);
+
+    // Використання операції додавання
+    Pair sumPair = pair1 + pair2;
+
+    // Виведення результатів для пар цілих чисел
+    std::cout << "Помножена пара: (" << multipliedPair.first << ", " << multipliedPair.second << ")\n";
+    std::cout << "Сума Пари: (" << sumPair.first << ", " << sumPair.second << ")\n";
+
+    // Створення грошових сум
+    Money money1(5, 75);
+    Money money2(3, 50);
+
+    // Використання перевизначеної операції додавання для грошових сум
+    Money totalMoney = money1 + money2;
+
+    // Використання методу віднімання
+    Money remainingMoney = money1.subtract(money2);
+
+    // Використання методу ділення
+    Money dividedMoney = money1.divide(2);
+
+    // Виведення результатів для грошових сум
+    std::cout << "\nЗагальна сума: (" << totalMoney.first << ", " << totalMoney.second << ")\n";
+    std::cout << "Залишок грошей: (" << remainingMoney.first << ", " << remainingMoney.second << ")\n";
+    std::cout << "Поділені гроші: (" << dividedMoney.first << ", " << dividedMoney.second << ")\n";
+
+    return 0;
+}
